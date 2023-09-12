@@ -94,38 +94,45 @@ if (-not (Test-Path $archivo)) {
     return
 }
 
-# Abrir el archivo en modo lectura
+$totalTTPS = (Get-Content $archivo).Count
 $stream = [System.IO.StreamReader] $archivo
+$count = 1
 
-# Leer línea por línea y mostrar en pantalla
 while (($ttp = $stream.ReadLine()) -ne $null) {
-    echo ""
-    echo ""
-    echo ""
+    Write-Host ""
+    Write-Host ""
+    Write-Host ""
     Write-Host "<---------------------- $ttp --------------------->"
     $init = Get-Date
-    echo "[$ttp] Information"
+    Write-Host "[$ttp] Information"
     Invoke-AtomicTest $ttp -ShowDetails
+
+    Write-Host ""
+    Write-Host "[$ttp] Get Prerequisites"
+    $atomlogpath = Join-Path $logFolder "${ttp}_GetPrereqs_log.json"
+    Invoke-AtomicTest T1003 -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -GetPrereqs
     # -TestNumbers 1,2
-    echo ""
-    echo "[$ttp] Executing"
+    Write-Host ""
+    Write-Host "[$ttp] Executing"
     # Path to log
-    $atomlogpath = Join-Path $logFolder "${ttp}_log.json"
+    $atomlogpath = Join-Path $logFolder "${ttp}_Execute_log.json"
     ## Execute 
     Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath
 
-    echo ""
-    echo "[$ttp] Cleaning"
+    Write-Host ""
+    Write-Host "[$ttp] Cleaning"
     $atomlogpath = Join-Path $logFolder "${ttp}_Clean_log.json"
     Invoke-AtomicTest $ttp -Cleanup -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath
 
     $end = Get-Date
-    echo "----------"
+    Write-Host "----------"
     Write-Host "[$ttp] Inicio: $init"
     Write-Host "[$ttp] Fin: $end"
+    Write-Host "----------"
+    Write-Host "TTP: $count de $totalTTPS"
+    $count++
     $respuesta = Read-Host "[i] ¿Siguiente? Escriba 'exit' para salir"
 
-    # Si el usuario escribe "exit", salir del bucle
     if ($respuesta.ToLower() -eq "exit") {
         break
     }
