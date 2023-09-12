@@ -110,19 +110,20 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
     Write-Host ""
     Write-Host "[$ttp] Get Prerequisites"
     $atomlogpath = Join-Path $logFolder "${ttp}_GetPrereqs_log.json"
-    Invoke-AtomicTest T1003 -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -GetPrereqs
-    # -TestNumbers 1,2
+    Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -GetPrereqs -Confirm:$false
+    
+	# -TestNumbers 1,2
     Write-Host ""
     Write-Host "[$ttp] Executing"
     # Path to log
     $atomlogpath = Join-Path $logFolder "${ttp}_Execute_log.json"
     ## Execute 
-    Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath
+    Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
 
     Write-Host ""
     Write-Host "[$ttp] Cleaning"
     $atomlogpath = Join-Path $logFolder "${ttp}_Clean_log.json"
-    Invoke-AtomicTest $ttp -Cleanup -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath
+    Invoke-AtomicTest $ttp -Cleanup -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
 
     $end = Get-Date
     Write-Host "----------"
