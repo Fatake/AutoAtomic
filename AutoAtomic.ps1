@@ -116,7 +116,6 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
 
     echo ""
     echo "[$ttp] Cleaning"
-    Start-Sleep 3
     $atomlogpath = Join-Path $logFolder "${ttp}_Clean_log.json"
     Invoke-AtomicTest $ttp -Cleanup -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath
 
