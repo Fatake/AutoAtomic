@@ -99,14 +99,14 @@ $stream = [System.IO.StreamReader] $archivo
 
 # Leer línea por línea y mostrar en pantalla
 while (($ttp = $stream.ReadLine()) -ne $null) {
+    echo ""
+    echo ""
+    echo ""
     Write-Host "<---------------------- $ttp --------------------->"
     $init = Get-Date
-    echo ""
-    echo ""
     echo "[$ttp] Information"
     Invoke-AtomicTest $ttp -ShowDetails
     # -TestNumbers 1,2
-    echo ""
     echo ""
     echo "[$ttp] Executing"
     # Path to log
@@ -114,7 +114,6 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
     ## Execute 
     Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath
 
-    echo ""
     echo ""
     echo "[$ttp] Cleaning"
     Start-Sleep 3
@@ -135,4 +134,3 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
 
 # Cerrar el archivo
 $stream.Close()
-#Stop-Transcript
