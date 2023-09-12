@@ -130,7 +130,7 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
     Write-Host "[$ttp] Inicio: $init"
     Write-Host "[$ttp] Fin: $end"
     Write-Host "----------"
-    Write-Host "TTP: $count de $totalTTPS"
+    Write-Host "Test $count de $totalTTPS"
     $count++
     $respuesta = Read-Host "[i] ¿Siguiente? Escriba 'exit' para salir"
 
