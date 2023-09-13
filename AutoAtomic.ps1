@@ -75,6 +75,7 @@ if ($Install -or $Payload) {
     exit
 }
 
+Write-Host "<---------------------- Auto Atomic --------------------->"
 Write-Host "[+] Iniciando Atomic Red team"
 # Obtener la ruta absoluta del directorio que contiene el script
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -84,7 +85,6 @@ if (-not (Test-Path -Path $logFolder -PathType Container)) {
     New-Item -Path $logFolder -ItemType Directory
 }
 Write-Host "[+] Log into: '$logFolder'."
-Write-Host "<------------------------------------------------->"
 
 $archivo = Join-Path $dir "ttps.txt"
 
@@ -103,40 +103,66 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
     Write-Host ""
     Write-Host ""
     Write-Host "<---------------------- $ttp --------------------->"
-    $init = Get-Date
-    Write-Host "[$ttp] Information"
+    Write-Host "[i] Test $count de $totalTTPS"
+    Write-Host "[$ttp] Información"
     Invoke-AtomicTest $ttp -ShowDetails
+    
+    $respuesta = ""
+    while ($respuesta -notin @("y", "n", "s", "e")) {
+        $respuesta = Read-Host "[i] ejecutar? (y[yes]/n[no]/e[exit])"
+        $respuesta = $respuesta.ToLower()
+    }
 
+    if ($respuesta -eq "e") {
+        break
+    } elseif ($respuesta -eq "n") {
+        Write-Host "[$ttp] Test omitido."
+        $count++
+        continue
+    }
+
+    ### -------------------------------- Pre requisitos -------------------------
     Write-Host ""
-    Write-Host "[$ttp] Get Prerequisites"
+    Write-Host "[$ttp] Pre requisitos"
     $atomlogpath = Join-Path $logFolder "${ttp}_GetPrereqs_log.json"
+    $init = Get-Date
+
     Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -GetPrereqs -Confirm:$false
     
-	# -TestNumbers 1,2
-    Write-Host ""
-    Write-Host "[$ttp] Executing"
-    # Path to log
-    $atomlogpath = Join-Path $logFolder "${ttp}_Execute_log.json"
-    ## Execute 
-    Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
-
-    Write-Host ""
-    Write-Host "[$ttp] Cleaning"
-    $atomlogpath = Join-Path $logFolder "${ttp}_Clean_log.json"
-    Invoke-AtomicTest $ttp -Cleanup -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
-
     $end = Get-Date
-    Write-Host "----------"
+    Write-Host "[$ttp] Logs: $atomlogpath"
     Write-Host "[$ttp] Inicio: $init"
     Write-Host "[$ttp] Fin: $end"
-    Write-Host "----------"
-    Write-Host "Test $count de $totalTTPS"
-    $count++
-    $respuesta = Read-Host "[i] ¿Siguiente? Escriba 'exit' para salir"
+    Write-Host "-----------------------"
 
-    if ($respuesta.ToLower() -eq "exit") {
-        break
-    }
+	### -------------------------------- Execution -------------------------
+    Write-Host ""
+    Write-Host "[$ttp] Ejecución"
+    $atomlogpath = Join-Path $logFolder "${ttp}_Execute_log.json"
+    $init = Get-Date
+
+    Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
+    
+    $end = Get-Date
+    Write-Host "[$ttp] Logs: $atomlogpath"
+    Write-Host "[$ttp] Inicio: $init"
+    Write-Host "[$ttp] Fin: $end"
+    Write-Host "-----------------------"
+
+    ### -------------------------------- Clean -------------------------
+    Write-Host ""
+    Write-Host "[$ttp] Limpieza"
+    $atomlogpath = Join-Path $logFolder "${ttp}_Clean_log.json"
+    $init = Get-Date
+
+    Invoke-AtomicTest $ttp -Cleanup -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
+    
+    $end = Get-Date
+    Write-Host "[$ttp] Logs: $atomlogpath"
+    Write-Host "[$ttp] Inicio: $init"
+    Write-Host "[$ttp] Fin: $end"
+    Write-Host "<---------------------- $ttp --------------------->"
+    $count++
 }
 
 # Cerrar el archivo
