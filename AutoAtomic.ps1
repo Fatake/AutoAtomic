@@ -79,17 +79,10 @@ if ($Install -or $Payload) {
 Write-Host "<---------------------- Auto Atomic --------------------->"
 $admin = [bool](New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
-if ($admin) {
-    Write-Host "[i] Script ejecutado con permisos de administrador"
-} 
+$ipAddress = (Get-NetIPAddress -AddressFamily IPV4 -InterfaceAlias Ethernet).IPAddress
 
-$ipAddress = (Get-NetIPAddress | Where-Object { $_.InterfaceAlias -eq 'Ethernet' -and $_.AddressFamily -eq 'IPv4' }).IPAddress
-
-Write-Host "[i] IP: $ipAddress"
-Write-Host "[i] User: $env:USERNAME"
-Write-Host "[i] Hostname: $env:COMPUTERNAME"
 Write-Host "[+] Iniciando Atomic Red team"
-exit 1
+
 # Obtener la ruta absoluta del directorio que contiene el script
 $dir = Split-Path -Parent $MyInvocation.MyCommand.Path
 
@@ -117,7 +110,7 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
     Write-Host ""
     Write-Host "<---------------------- $ttp --------------------->"
     Write-Host "[i] Test $count de $totalTTPS"
-    Write-Host "[$ttp] Información"
+    Write-Host "[$ttp] ---------- Información"
     Invoke-AtomicTest $ttp -ShowDetails
     
     $respuesta = ""
@@ -129,14 +122,14 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
     if ($respuesta -eq "e") {
         break
     } elseif ($respuesta -eq "n") {
-        Write-Host "[$ttp] Test omitido."
+        Write-Host "[$ttp] ---------- Test omitido."
         $count++
         continue
     }
 
     ### -------------------------------- Pre requisitos -------------------------
     Write-Host ""
-    Write-Host "[$ttp] Pre requisitos"
+    Write-Host "[$ttp] ---------- Pre requisitos"
     $atomlogpath = Join-Path $logFolder "${ttp}_GetPrereqs_log.json"
     $init = Get-Date
 
@@ -150,16 +143,22 @@ while (($ttp = $stream.ReadLine()) -ne $null) {
 
 	### -------------------------------- Execution -------------------------
     Write-Host ""
-    Write-Host "[$ttp] Ejecución"
+    Write-Host "[$ttp] ---------- Ejecución"
     $atomlogpath = Join-Path $logFolder "${ttp}_Execute_log.json"
     $init = Get-Date
 
     Invoke-AtomicTest $ttp -LoggingModule "Attire-ExecutionLogger" -ExecutionLogPath $atomlogpath -Confirm:$false
     
     $end = Get-Date
+    if ($admin) {
+        Write-Host "[$ttp] TTP ejecutada con permisos de administrador"
+    } 
     Write-Host "[$ttp] Logs: $atomlogpath"
     Write-Host "[$ttp] Inicio: $init"
     Write-Host "[$ttp] Fin: $end"
+    Write-Host "[$ttp] IP: $ipAddress"
+    Write-Host "[$ttp] User: $env:USERNAME"
+    Write-Host "[$ttp] Hostname: $env:COMPUTERNAME"
     Write-Host "-----------------------"
 
     ### -------------------------------- Clean -------------------------
