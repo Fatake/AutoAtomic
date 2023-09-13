@@ -1,6 +1,7 @@
 ﻿param (
     [switch]$Install,
     [switch]$Payload,
+    [switch]$TTPfile,
     [switch]$Help
 )
 
@@ -75,6 +76,9 @@ if ($Install -or $Payload) {
     exit
 }
 
+if ($TTPfile ) {
+    Write-Host "To do --input-test fileattp.txt."
+}
 
 Write-Host "<---------------------- Auto Atomic --------------------->"
 $admin = [bool](New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
