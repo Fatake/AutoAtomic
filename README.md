@@ -7,14 +7,14 @@ con el framework de invoke-atomicredteam, generando logs de cada TTP en formato 
 
 Uso: `.\AutoAtomic.ps1 [-i] [-p] [-t] [-h]`
 Donde:
-
+```
 -i,-InstallFramework          Instala Atomic Red Team.
 -p,-PayloadsInstall           Instala los Payloads de Atomic.
 -t,-TestFile                  Establece una ruta diferente a 'ttps.txt'.
                               Con otros TTPs definidos por el usuarios.
                               Si nó se especifica, su valor por defecto es 'ttps.txt'.
 -h,-Help                      Muestra esta ayuda.
-
+```
 
 ### Ejemplos
 
