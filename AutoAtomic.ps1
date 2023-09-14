@@ -1,7 +1,7 @@
 ﻿param (
-    [switch]$Install,
-    [switch]$Payload,
-    [switch]$TTPfile,
+    [switch]$InstallFramework,
+    [switch]$PayloadsInstall,
+    [string]$TestFile="ttps.txt",
     [switch]$Help
 )
 
@@ -17,10 +17,13 @@ function Show-Help {
     Write-Host ""
     Write-Host ""
     Write-Host "<---------------------- Uso --------------------->"
-    Write-Host "Uso: AutoAtomic.ps1 [-i] [-p] [-h]"
-    Write-Host "  -i   Instala Atomic Red Team."
-    Write-Host "  -p   Instala los Payloads de Atomic."
-    Write-Host "  -h   Muestra esta ayuda."
+    Write-Host "Uso: AutoAtomic.ps1 [-i] [-p] [-t] [-h]"
+    Write-Host "  -i,-InstallFramework      Instala Atomic Red Team."
+    Write-Host "  -p,-PayloadsInstall       Instala los Payloads de Atomic."
+    Write-Host "  -t,-TestFile              Especifica una ruta diferente a 'ttps.txt'."
+    Write-Host "                            Con otros TTPs definidos por el usuarios."
+    Write-Host "                            Si nó se especifíca, su valor por defecto es 'ttps.txt'."
+    Write-Host "  -h,-Help                  Muestra esta ayuda."
     Write-Host ""
     Write-Host ""
     Write-Host "<---------------------- Ejemplos --------------------->"
@@ -41,6 +44,7 @@ function Show-Help {
     Write-Host "T1033"
     Write-Host "T1087.002"
     Write-Host "T1497.001-2"
+    Write-Host "[i] Se puede hacer uso de -t o -Testfile para cambiar el archivo y especificar otro definido por el usuario"
     Write-Host ""
     Write-Host ""
     Write-Host "[i] Creado por Fatake"
@@ -63,24 +67,21 @@ if ($Help) {
     exit
 }
 
-if ($Install) {
+if ($InstallFramework) {
     Install-AtomicRedTeam
 }
 
-if ($Payload) {
+if ($PayloadsInstall) {
     Install-Payload
 }
 
-if ($Install -or $Payload) {
+if ($InstallFramework -or $PayloadsInstall) {
     Write-Host "[i] Finalizado"
     exit
 }
 
-if ($TTPfile ) {
-    Write-Host "To do --input-test fileattp.txt."
-}
-
 Write-Host "<---------------------- Auto Atomic --------------------->"
+
 $admin = [bool](New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
 $ipAddress = (Get-NetIPAddress -AddressFamily IPV4 -InterfaceAlias Ethernet).IPAddress
@@ -94,13 +95,14 @@ $logFolder = Join-Path $dir "AtomicLog-$(Get-Date -UFormat %Y-%m-%d)"
 if (-not (Test-Path -Path $logFolder -PathType Container)) {
     New-Item -Path $logFolder -ItemType Directory
 }
-Write-Host "[+] Log into: '$logFolder'."
+Write-Host "[+] Archivo de logs en: '$logFolder'."
 
-$archivo = Join-Path $dir "ttps.txt"
+$archivo = Join-Path $dir $TestFile
+Write-Host "[i] Usando archivo: '$archivo'."
 
 # Verificar si el archivo existe
 if (-not (Test-Path $archivo)) {
-    Write-Error "[!] El archivo 'ttps.txt' debe estar en la misma ruta que el script"
+    Write-Error "[!] No se encontró el archivo'$TestFile' d"
     return
 }
 
@@ -108,7 +110,7 @@ $totalTTPS = (Get-Content $archivo).Count
 $stream = [System.IO.StreamReader] $archivo
 $count = 1
 
-while (($ttp = $stream.ReadLine()) -ne $null) {
+while ($null -ne ($ttp = $stream.ReadLine())) {
     Write-Host ""
     Write-Host ""
     Write-Host ""
