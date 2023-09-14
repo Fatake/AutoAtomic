@@ -52,6 +52,7 @@ function Show-Help {
 
 function Install-AtomicRedTeam {
     Write-Host "[+] Instalando Atomic Red Team"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
     Install-Module -Name invoke-atomicredteam,powershell-yaml -Scope CurrentUser -Force
 }
 
