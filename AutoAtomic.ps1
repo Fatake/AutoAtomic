@@ -50,13 +50,13 @@ function Show-Help {
     Write-Host "[i] Creado por Fatake"
 }
 
-function Install-AtomicRedTeam {
+function Install-ART {
     Write-Host "[+] Instalando Atomic Red Team"
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
     Install-Module -Name invoke-atomicredteam,powershell-yaml -Scope CurrentUser -Force
 }
 
-function Install-Payload {
+function Install-Payloads {
     Write-Host "[+] Instalado Atomics Payloads"
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; 
     IEX (IWR 'https://raw.githubusercontent.com/redcanaryco/invoke-atomicredteam/master/install-atomicredteam.ps1' -UseBasicParsing); 
@@ -69,11 +69,11 @@ if ($Help) {
 }
 
 if ($InstallFramework) {
-    Install-AtomicRedTeam
+    Install-ART
 }
 
 if ($PayloadsInstall) {
-    Install-Payload
+    Install-Payloads
 }
 
 if ($InstallFramework -or $PayloadsInstall) {
