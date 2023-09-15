@@ -1,6 +1,7 @@
 ﻿param (
     [switch]$InstallFramework,
     [switch]$PayloadsInstall,
+    [switch]$Automatic,
     [string]$TestFile="ttps.txt",
     [switch]$Help
 )
@@ -23,6 +24,7 @@ function Show-Help {
     Write-Host "  -t,-TestFile              Establece una ruta diferente a 'ttps.txt'."
     Write-Host "                            Con otros TTPs definidos por el usuarios."
     Write-Host "                            Si nó se especifica, su valor por defecto es 'ttps.txt'."
+    Write-Host "  -a,-Automatic             ! Este modo ejecutará el script sin intervención del usuaro"
     Write-Host "  -h,-Help                  Muestra esta ayuda."
     Write-Host ""
     Write-Host ""
@@ -81,7 +83,16 @@ if ($InstallFramework -or $PayloadsInstall) {
     exit
 }
 
+
+
 Write-Host "<---------------------- Auto Atomic --------------------->"
+
+if($Automatic){
+    Write-Host "[!] Modo Automático"
+    Write-Host "[!] Este modo puede ser peligroso ya que no tiene control de la ejecución de los comandos"
+} else {
+    Write-Host "[i] Ejecutando TTP una por una"
+}
 
 $admin = [bool](New-Object Security.Principal.WindowsPrincipal([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 
@@ -119,21 +130,23 @@ while ($null -ne ($ttp = $stream.ReadLine())) {
     Write-Host "[i] Test $count de $totalTTPS"
     Write-Host "[$ttp] ---------- Información"
     Invoke-AtomicTest $ttp -ShowDetails
+
+    if(-not $Automatic){
+        $respuesta = ""
+        while ($respuesta -notin @("y", "n", "s", "e")) {
+            $respuesta = Read-Host "[i] ejecutar? (y[yes]/n[no]/e[exit])"
+            $respuesta = $respuesta.ToLower()
+        }
+
+        if ($respuesta -eq "e") {
+            break
+        } elseif ($respuesta -eq "n") {
+            Write-Host "[$ttp] ---------- Test omitido."
+            $count++
+            continue
+        }
+    }
     
-    $respuesta = ""
-    while ($respuesta -notin @("y", "n", "s", "e")) {
-        $respuesta = Read-Host "[i] ejecutar? (y[yes]/n[no]/e[exit])"
-        $respuesta = $respuesta.ToLower()
-    }
-
-    if ($respuesta -eq "e") {
-        break
-    } elseif ($respuesta -eq "n") {
-        Write-Host "[$ttp] ---------- Test omitido."
-        $count++
-        continue
-    }
-
     ### -------------------------------- Pre requisitos -------------------------
     Write-Host ""
     Write-Host "[$ttp] ---------- Pre requisitos"
