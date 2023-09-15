@@ -18,7 +18,7 @@ function Show-Help {
     Write-Host ""
     Write-Host ""
     Write-Host "<---------------------- Uso --------------------->"
-    Write-Host "Uso: AutoAtomic.ps1 [-i] [-p] [-t] [-h]"
+    Write-Host "Uso: AutoAtomic.ps1 [-i] [-p] [-t] [-a] [-h]"
     Write-Host "  -i,-InstallFramework      Instala Atomic Red Team."
     Write-Host "  -p,-PayloadsInstall       Instala los Payloads de Atomic."
     Write-Host "  -t,-TestFile              Establece una ruta diferente a 'ttps.txt'."
