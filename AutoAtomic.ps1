@@ -15,6 +15,8 @@ function Show-Help {
     Write-Host "[i] Para ejecutar este script es necesario tener permisos de ejecución de scripts"
     Write-Host "[+] Puede usar el siguiente comando $ powershell -ExecutionPolicy Bypass  "
     # set-executionpolicy remotesigned para habilitar script tambien funciona
+    # Set-ExecutionPolicy -Scope LocalMachine unrestricted
+    # Set-ExecutionPolicy -Scope CurrentUser unrestricted
     Write-Host ""
     Write-Host ""
     Write-Host "<---------------------- Uso --------------------->"
